@@ -1,0 +1,43 @@
+N = 50; % numarul de coeficienti
+D = 6; % durata de crestere
+P = 40; % perioada
+F=1/P; % frecventa 
+w0=2*pi/P; % pulsatia
+r=0.02; % rezolutia
+t=0:r:P-r; % vectorul timp pentru o perioada
+
+%constructia unei perioade a semnalului
+x = zeros(1,size(t,2)); % initializarea lui x cu zerouri
+for i=0 : 1 : D/r
+   x(i+1) = 1 - 1/8*i*r ;
+end
+
+m=0
+for i=(P-D)/r : 1 : P/r    
+    x(i) = 1/8 * m * r;
+    m=m+1;
+end
+
+%reprezentarea unei perioade a semnalului
+figure(1), plot(t,x)
+
+
+% determinarea coeficientilor fourier
+for k = -N:N
+    a = x;
+    a = a.*exp(-j*k*w0*t);
+    X(k+51) = trapz(t,a); % calcularea integralei cu metoda trapezului
+end
+
+x_ref(1:length(t)) = 0; % initializarea semnalului reconstruit cu N puncte
+f = -N*F:F:N*F; % vectorul de frecvente
+
+figure(2), stem(f,abs(X)), title('Spectrul lui x(t)');
+
+
+%reconstructia lui x(t) folosind N coeficienti
+for i = 1:length(t);
+for k = -N:N
+x_ref(i) = x_ref(i) + (1/P)*X(k+N+1)*exp(j*k*w0*t(i));
+end
+end
